@@ -6,6 +6,28 @@ import pandas as pd
 def revert_dict(input_dict):
     return dict([(value, key) for key, value in input_dict.items()])
 
+def get_action(qvals, player_lambda):
+    """Choose action using softmax"""
+
+    prob = 1 / (1 + np.exp(player_lambda * (qvals[1] - qvals[0])))
+    current_probs = [prob, 1 - prob]
+    action_id = np.random.choice(2, p=current_probs)
+    return action_id
+
+
+class SimpleModel(nn.Module):
+    def __init__(self, n_features, hidden_size=16):
+        super().__init__()
+        self.linear_1 = nn.Linear(n_features, hidden_size)
+        self.linear_2 = nn.Linear(hidden_size, hidden_size)
+        self.linear_3 = nn.Linear(hidden_size, 1)
+
+    def forward(self, features):
+        output = nn.functional.relu(self.linear_1(features))
+        output = nn.functional.relu(self.linear_2(output))
+        output = self.linear_3(output)
+        return output
+
 
 def plot_qvalues(qvalues, size, eps=None, rewards=None):
     """
